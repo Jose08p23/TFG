@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: "Assets/Scenes/Men\xFA.unity"
+    guid: 0eb1691ebab703d49a74257a1b2f2eaa
+  - enabled: 1
+    path: Assets/Scenes/Nivel 1.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/DeathMenu.unity
+    guid: 6dc347b2e46600c44998fb10eecb96cd
+  - enabled: 1
+    path: Assets/Scenes/WinMenu.unity
+    guid: 9cf5c74479519b441adbd611b5ce4ff3
+  m_configObjects: {}
