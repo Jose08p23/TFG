@@ -12,7 +12,7 @@ public class WinFlag : MonoBehaviour
         Debug.Log("Trigger detectado con: " + other.gameObject.name);
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Jugador detectado, cargando escena 3 en " + delay + " segundos");
+            Debug.Log("Jugador detectado, cargando escena 3 con fade en " + delay + " segundos");
             StartCoroutine(LoadSceneAfterDelay(delay));
         }
     }
@@ -20,6 +20,14 @@ public class WinFlag : MonoBehaviour
     private IEnumerator LoadSceneAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(3);
+
+        if (FadeManager.Instance != null)
+        {
+            FadeManager.Instance.CambiarEscena("WinMenu"); // Reemplaza con el nombre real de tu escena 3
+        }
+        else
+        {
+            SceneManager.LoadScene(3); // Fallback si el FadeManager no está presente
+        }
     }
 }

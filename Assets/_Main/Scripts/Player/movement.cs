@@ -3,37 +3,38 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float velocidad = 5f;            // Velocidad de movimiento horizontal
-    public float fuerzaSalto = 10f;         // Fuerza aplicada en el salto
-    public LayerMask capaSuelo;             // Capa que representa el suelo (para detectar aterrizajes)
+    public float velocidad = 5f;
+    public float fuerzaSalto = 10f;
+    public LayerMask capaSuelo;
     public float tiempoBloqueoMovimiento = 3f;
     public float fuerzaGolpe;
     public AudioClip SonidoSalto;
     public AudioClip SonidoGolpe;
     public float coolDownParpadeo;
+    public float suavizadoAceleracion = 10f;
 
-    public bool puedeRecibirDaño = true;    // Indica si el jugador puede recibir daño
+    public bool puedeRecibirDaño = true;
 
-    private Rigidbody2D rb;                 // Componente de física del jugador
-    private BoxCollider2D boxCollider;      // Para detección de colisiones con el suelo
-    private Animator animator;              // Controla las animaciones
-    private bool mirandoDerecha = true;     // Controla la orientación del personaje
-    private bool puedeHacerDobleSalto = false; // Permite doble salto (si está activado)
-    private bool movimientoHabilitado = false; // Indica si el jugador puede moverse
+    private Rigidbody2D rb;
+    private BoxCollider2D boxCollider;
+    private Animator animator;
+    private bool mirandoDerecha = true;
+    private bool puedeHacerDobleSalto = false;
+    private bool movimientoHabilitado = false;
 
-    private float tiempoBufferSalto = 0.05f;  // Tolerancia para detectar el salto
-    private float tiempoUltimaTeclaSalto = 0f;  // Último instante en que se pulsó salto
+    private float tiempoBufferSalto = 0.05f;
+    private float tiempoUltimaTeclaSalto = 0f;
 
-    // Referencia a plataforma en movimiento (si aplica)
     private MovingPlatform currentPlatform;
-    // Indica si el jugador está “parado” sobre la plataforma
     private bool standingOnPlatform = false;
+
+    private float velocidadActual = 0f;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();       
-        boxCollider = GetComponent<BoxCollider2D>(); 
-        animator = GetComponent<Animator>();       
+        rb = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
+        animator = GetComponent<Animator>();
         StartCoroutine(HabilitarMovimientoDespuesDeTiempo());
     }
 
@@ -52,8 +53,7 @@ public class PlayerController : MonoBehaviour
     {
         if (movimientoHabilitado)
         {
-            // Captura la entrada para el salto (buffer)
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump"))
             {
                 tiempoUltimaTeclaSalto = tiempoBufferSalto;
             }
@@ -61,10 +61,10 @@ public class PlayerController : MonoBehaviour
             {
                 tiempoUltimaTeclaSalto -= Time.deltaTime;
             }
-            
+
             ProcesarSalto();
         }
-        
+
         ActualizarAnimaciones();
     }
 
@@ -73,10 +73,19 @@ public class PlayerController : MonoBehaviour
         if (!movimientoHabilitado)
             return;
 
-        float inputMovimiento = Input.GetAxis("Horizontal");
+        float inputTeclado = Input.GetAxis("Horizontal");
+        float inputDpad = Input.GetAxis("DPadX");
+
+        // Elegir el input más fuerte (DPad tiene prioridad si activo)
+        float inputMovimiento = Mathf.Abs(inputDpad) > 0.1f ? inputDpad : inputTeclado;
+
         animator.SetBool("isRunning", Mathf.Abs(inputMovimiento) > 0.01f);
 
-        float horizontalInputVel = inputMovimiento * velocidad;
+        // Detectar si estamos usando joystick (valor parcial)
+        bool usandoJoystick = Mathf.Abs(inputMovimiento) < 0.99f;
+        float factorSuavizado = usandoJoystick ? suavizadoAceleracion : suavizadoAceleracion * 2f;
+
+        velocidadActual = Mathf.Lerp(velocidadActual, inputMovimiento * velocidad, factorSuavizado * Time.fixedDeltaTime);
 
         Vector2 platformVel = Vector2.zero;
         if (currentPlatform != null)
@@ -86,15 +95,15 @@ public class PlayerController : MonoBehaviour
 
         if (currentPlatform != null && standingOnPlatform)
         {
-            rb.velocity = new Vector2(horizontalInputVel + platformVel.x, platformVel.y);
+            rb.velocity = new Vector2(velocidadActual + platformVel.x, platformVel.y);
         }
         else if (currentPlatform != null)
         {
-            rb.velocity = new Vector2(horizontalInputVel + platformVel.x, rb.velocity.y);
+            rb.velocity = new Vector2(velocidadActual + platformVel.x, rb.velocity.y);
         }
         else
         {
-            rb.velocity = new Vector2(horizontalInputVel, rb.velocity.y);
+            rb.velocity = new Vector2(velocidadActual, rb.velocity.y);
         }
 
         GestionarOrientacion(inputMovimiento);
@@ -114,7 +123,7 @@ public class PlayerController : MonoBehaviour
         float extraHeight = 0.05f;
         Vector2 origin = new Vector2(boxCollider.bounds.center.x, boxCollider.bounds.min.y);
         Vector2 size = new Vector2(boxCollider.bounds.size.x * 0.8f, 0.02f);
-        
+
         RaycastHit2D raycastHit = Physics2D.BoxCast(origin, size, 0f, Vector2.down, extraHeight, capaSuelo);
         return raycastHit.collider != null && raycastHit.normal.y > 0.7f;
     }
@@ -123,7 +132,6 @@ public class PlayerController : MonoBehaviour
     {
         if (tiempoUltimaTeclaSalto > 0)
         {
-            // Permitir salto si estamos en suelo o sobre una plataforma
             if (EstaEnSuelo() || standingOnPlatform)
             {
                 Saltar();
@@ -181,12 +189,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Aquí se reactivará la vulnerabilidad SOLO si se ha aterrizado "completamente"
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (((1 << collision.gameObject.layer) & capaSuelo) != 0)
         {
-            // Solo se reactiva si la velocidad vertical es casi nula (evita reactivación por golpes)
             if (Mathf.Abs(rb.velocity.y) < 0.1f)
             {
                 animator.SetBool("isJumping", false);
@@ -194,7 +200,7 @@ public class PlayerController : MonoBehaviour
                 puedeRecibirDaño = true;
             }
         }
-        
+
         MovingPlatform plataforma = collision.gameObject.GetComponent<MovingPlatform>();
         if (plataforma != null)
         {
@@ -229,7 +235,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // El método AplicarGolpe aplica siempre el knockback, sin condicionar el daño
     public void AplicarGolpe()
     {
         movimientoHabilitado = false;

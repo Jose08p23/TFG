@@ -6,47 +6,72 @@ using UnityEngine.SceneManagement;
 public class MenuPrincipal : MonoBehaviour
 {
     public GameObject menuPausa;
+    public GameObject opcionesPanel;
     public bool juegoPausado = false;
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (juegoPausado)
+            if (juegoPausado && opcionesPanel.activeSelf)
+            {
+                CerrarOpciones();
+            }
+            else if (juegoPausado)
             {
                 Reanudar();
             }
-            else 
-            { 
-                Pausar(); 
+            else
+            {
+                Pausar();
             }
         }
     }
 
     public void Reanudar()
     {
-        menuPausa.SetActive(false);
+        if (menuPausa != null) menuPausa.SetActive(false);
+        if (opcionesPanel != null) opcionesPanel.SetActive(false);
         Time.timeScale = 1;
         juegoPausado = false;
     }
 
     public void Pausar()
     {
-        menuPausa.SetActive(true);
+        if (menuPausa != null) menuPausa.SetActive(true);
         Time.timeScale = 0;
         juegoPausado = true;
     }
 
-    // Ahora carga siempre la escena 1.
     public void Jugar()
     {
-        SceneManager.LoadScene(1);
+        Time.timeScale = 1;
+        juegoPausado = false;
+
+        // Transición con FadeManager
+        if (FadeManager.Instance != null)
+        {
+            FadeManager.Instance.CambiarEscena("Nivel 1"); // Usa el nombre exacto de tu escena del juego
+        }
+        else
+        {
+            SceneManager.LoadScene("Nivel 1");
+        }
     }
 
-    // Función que carga la escena 0 (Menú Principal).
     public void MenuPrincipalFunc()
     {
-        SceneManager.LoadScene(0);
+        Time.timeScale = 1;
+        juegoPausado = false;
+
+        if (FadeManager.Instance != null)
+        {
+            FadeManager.Instance.CambiarEscena("Menú"); // Usa el nombre exacto de la escena del menú
+        }
+        else
+        {
+            SceneManager.LoadScene("Menú");
+        }
     }
 
     public void Salir()
@@ -55,11 +80,32 @@ public class MenuPrincipal : MonoBehaviour
         Application.Quit();
     }
 
-      public void Reiniciar()
+    public void Reiniciar()
     {
-        menuPausa.SetActive(false);
+        if (menuPausa != null) menuPausa.SetActive(false);
+        if (opcionesPanel != null) opcionesPanel.SetActive(false);
         Time.timeScale = 1;
         juegoPausado = false;
-        SceneManager.LoadScene(1);
+
+        if (FadeManager.Instance != null)
+        {
+            FadeManager.Instance.CambiarEscena("Nivel 1"); // Usa el nombre exacto de tu escena
+        }
+        else
+        {
+            SceneManager.LoadScene("Nivel 1");
+        }
+    }
+
+    public void AbrirOpciones()
+    {
+        if (opcionesPanel != null)
+            opcionesPanel.SetActive(true);
+    }
+
+    public void CerrarOpciones()
+    {
+        if (opcionesPanel != null)
+            opcionesPanel.SetActive(false);
     }
 }
