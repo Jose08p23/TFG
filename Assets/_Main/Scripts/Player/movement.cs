@@ -237,6 +237,7 @@ public class PlayerController : MonoBehaviour
 
     public void AplicarGolpe()
     {
+        Debug.Log("Golpe recibido");
         movimientoHabilitado = false;
         AudioManager.Instance.ReproducirSonido(SonidoGolpe);
         Vector2 direccionGolpe = rb.velocity.x > 0 ? new Vector2(-1, 1) : new Vector2(1, 1);

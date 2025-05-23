@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
     {
         hud = FindObjectOfType<HUD>();
 
+
+
         if (hud != null)
         {
             hud.ActualizarPuntos(puntosTotales);
@@ -58,21 +60,22 @@ public class GameManager : MonoBehaviour
             hud.ActualizarTimerStatic(timer);
         }
 
-        if (scene.buildIndex == 1)
+        // Solo reiniciar si NO estamos en DeathMenu ni WinMenu
+        if (scene.name != "DeathMenu" && scene.name != "WinMenu")
         {
             ReiniciarValores();
         }
     }
 
-    void Update()
-    {
-        timer += Time.deltaTime;
-
-        if (hud != null)
+        void Update()
         {
-            hud.ActualizarTimer(timer);
+            timer += Time.deltaTime;
+
+            if (hud != null)
+            {
+                hud.ActualizarTimer(timer);
+            }
         }
-    }
 
     public void SumarPuntos(int puntosASumar)
     {
@@ -85,6 +88,7 @@ public class GameManager : MonoBehaviour
 
     public void PerderVida()
     {
+        Debug.Log("Vida perdida. Vidas restantes: " + vidas);
         if (vidas <= 0) return;
 
         vidas--;
@@ -96,9 +100,14 @@ public class GameManager : MonoBehaviour
 
         if (vidas <= 0)
         {
-            SceneManager.LoadScene(2); // Escena de muerte
+            SceneTracker.EscenaAnterior = SceneManager.GetActiveScene().name;
+
+            Debug.Log("Cambiando a escena de muerte...");
+
+            SceneManager.LoadScene("DeathMenu"); // Usa el nombre exacto de tu escena
         }
     }
+
 
     public bool RecuperarVida()
     {

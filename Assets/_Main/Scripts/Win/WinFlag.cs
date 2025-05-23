@@ -16,18 +16,20 @@ public class WinFlag : MonoBehaviour
             StartCoroutine(LoadSceneAfterDelay(delay));
         }
     }
+private IEnumerator LoadSceneAfterDelay(float delay)
+{
+    yield return new WaitForSeconds(delay);
 
-    private IEnumerator LoadSceneAfterDelay(float delay)
+    SceneTracker.EscenaAnterior = SceneManager.GetActiveScene().name;
+
+    if (FadeManager.Instance != null)
     {
-        yield return new WaitForSeconds(delay);
-
-        if (FadeManager.Instance != null)
-        {
-            FadeManager.Instance.CambiarEscena("WinMenu"); // Reemplaza con el nombre real de tu escena 3
-        }
-        else
-        {
-            SceneManager.LoadScene(3); // Fallback si el FadeManager no está presente
-        }
+        FadeManager.Instance.CambiarEscena("WinMenu"); 
     }
+    else
+    {
+        SceneManager.LoadScene("WinMenu");
+    }
+}
+
 }
