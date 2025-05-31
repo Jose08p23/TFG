@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47462ed6b4deebd4288cc5c8c397944f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadSubida: 1
+  velocidadSubida: 0.7
   sonidoQuemadura: {fileID: 0}
   nombreEscenaMuerte: DeathMenu
   delayAntesDeMorir: 0.8
