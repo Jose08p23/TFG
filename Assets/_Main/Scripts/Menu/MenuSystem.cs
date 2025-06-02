@@ -53,11 +53,11 @@ public class MenuPrincipal : MonoBehaviour
         // Transición con FadeManager
         if (FadeManager.Instance != null)
         {
-            FadeManager.Instance.CambiarEscena("Nivel 1"); // Usa el nombre exacto de tu escena del juego
+            FadeManager.Instance.CambiarEscena("Level 1"); // Usa el nombre exacto de tu escena del juego
         }
         else
         {
-            SceneManager.LoadScene("Nivel 1");
+            SceneManager.LoadScene("Level 1");
         }
     }
 
