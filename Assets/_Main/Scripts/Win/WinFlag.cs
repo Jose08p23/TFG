@@ -35,7 +35,7 @@ public class WinFlag : MonoBehaviour
 
         // Detectar el modo de juego en base al nombre de la escena
         ModoJuegoData modo = null;
-        if (escenaActual.StartsWith("NivelLava"))
+        if (escenaActual.StartsWith("LavaLevel"))
             modo = progreso.lava;
         else if (escenaActual.StartsWith("Hitless"))
             modo = progreso.hitless;
