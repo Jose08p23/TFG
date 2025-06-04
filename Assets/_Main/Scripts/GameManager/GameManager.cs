@@ -130,23 +130,39 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
-    private void ReiniciarValores()
+   private void ReiniciarValores()
+{
+    // Detectar escena y establecer vidasIniciales
+    string nombreEscena = SceneManager.GetActiveScene().name;
+    if (nombreEscena.StartsWith("Hitless"))
     {
-        puntosTotales = 0;
-        vidas = vidasIniciales;
-        timer = 0f;
-
-        if (hud != null)
-        {
-            hud.ActualizarPuntos(puntosTotales);
-            for (int i = 0; i < hud.vidas.Length; i++)
-            {
-                hud.vidas[i].SetActive(true);
-            }
-            hud.ActualizarTimer(timer);
-            hud.ActualizarTimerStatic(timer);
-        }
+        vidasIniciales = 1;
+        Debug.Log("[GameManager] Modo Hitless detectado. Vidas iniciales: 1");
     }
+    else
+    {
+        vidasIniciales = 3;
+        Debug.Log("[GameManager] Modo normal. Vidas iniciales: 3");
+    }
+    vidas = vidasIniciales;
+
+    puntosTotales = 0;
+    timer = 0f;
+
+    Debug.Log("[GameManager] Valores reiniciados. Vidas: " + vidasIniciales + ", Puntos: 0, Timer: 0");
+
+    if (hud != null)
+    {
+        hud.ActualizarPuntos(puntosTotales);
+        for (int i = 0; i < hud.vidas.Length; i++)
+        {
+            hud.vidas[i].SetActive(true);
+        }
+        hud.ActualizarTimer(timer);
+        hud.ActualizarTimerStatic(timer);
+    }
+}
+
 
     public void GuardarVolumenes()
     {

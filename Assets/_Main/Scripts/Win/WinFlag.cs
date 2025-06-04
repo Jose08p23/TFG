@@ -47,15 +47,37 @@ public class WinFlag : MonoBehaviour
         int numeroNivel = (match.Success ? int.Parse(match.Value) - 1 : -1);
 
         if (modo != null && numeroNivel >= 0 && numeroNivel < modo.niveles.Count)
-        {
-            var nivel = modo.niveles[numeroNivel];
-            nivel.completado = true;
-            nivel.monedasRecogidas = GameManager.Instance.PuntosTotales;
-            nivel.mejorTiempo = GameManager.Instance.Timer;
+{
+    var nivel = modo.niveles[numeroNivel];
 
-            progreso.Guardar();
-            Debug.Log($"Progreso guardado para {escenaActual} - Monedas: {nivel.monedasRecogidas}, Tiempo: {nivel.mejorTiempo}");
-        }
+    int nuevasMonedas = GameManager.Instance.PuntosTotales;
+    float nuevoTiempo = GameManager.Instance.Timer;
+
+    // Guardar solo si hay mejora de monedas
+    if (nuevasMonedas > nivel.monedasRecogidas)
+    {
+        Debug.Log($"[Guardado] Mejorando monedas: {nivel.monedasRecogidas} -> {nuevasMonedas}");
+        nivel.monedasRecogidas = nuevasMonedas;
+    }
+
+    // Guardar solo si el tiempo es mejor o no existía
+    if (nivel.mejorTiempo <= 0f || nuevoTiempo < nivel.mejorTiempo)
+    {
+        Debug.Log($"[Guardado] Mejorando tiempo: {nivel.mejorTiempo} -> {nuevoTiempo}");
+        nivel.mejorTiempo = nuevoTiempo;
+    }
+
+    // Marcar como completado si no lo estaba
+    if (!nivel.completado)
+    {
+        Debug.Log("[Guardado] Marcando nivel como completado.");
+        nivel.completado = true;
+    }
+
+    progreso.Guardar();
+    Debug.Log($"Progreso guardado para {escenaActual} - Monedas: {nivel.monedasRecogidas}, Tiempo: {nivel.mejorTiempo}");
+}
+
         else
         {
             Debug.LogWarning("No se pudo guardar el progreso del nivel. Datos inválidos.");
