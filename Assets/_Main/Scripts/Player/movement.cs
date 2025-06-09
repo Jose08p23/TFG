@@ -270,4 +270,18 @@ public class PlayerController : MonoBehaviour
 
         sr.enabled = true;
     }
+
+    public void BloquearMovimientoTemporal(float segundos)
+{
+    StartCoroutine(BloquearMovimientoCoroutine(segundos));
+}
+
+private IEnumerator BloquearMovimientoCoroutine(float segundos)
+{
+    movimientoHabilitado = false;
+    rb.velocity = Vector2.zero;  // ¡Esto para que se quede quieto!
+    yield return new WaitForSeconds(segundos);
+    movimientoHabilitado = true;
+}
+
 }

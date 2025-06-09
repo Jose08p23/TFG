@@ -11,6 +11,9 @@ public class Lava : MonoBehaviour
     [Tooltip("Sonido que se reproduce al quemar al jugador")]
     public AudioClip sonidoQuemadura;
 
+    [Tooltip("Sonido ambiente que se reproduce en bucle mientras la lava está activa")]
+    public AudioClip sonidoAmbienteLava;
+
     [Header("Escena")]
     [Tooltip("Nombre de la escena que se carga al morir")]
     public string nombreEscenaMuerte = "DeathMenu";
@@ -19,6 +22,22 @@ public class Lava : MonoBehaviour
     public float delayAntesDeMorir = 0.5f;
 
     private bool haQuemado = false;
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        // Configura el AudioSource para el sonido ambiente de la lava
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = sonidoAmbienteLava;
+        audioSource.loop = true;
+        audioSource.playOnAwake = true;
+        audioSource.volume = 0.8f; // Puedes ajustar el volumen aquí
+
+        if (sonidoAmbienteLava != null)
+        {
+            audioSource.Play();
+        }
+    }
 
     void Update()
     {
@@ -34,6 +53,13 @@ public class Lava : MonoBehaviour
         {
             haQuemado = true;
 
+            // Bloquear movimiento del jugador 3 segundos
+            var playerController = other.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.BloquearMovimientoTemporal(3f); // 3 segundos
+            }
+
             // Reproducir sonido desde el AudioManager
             if (sonidoQuemadura != null && AudioManager.Instance != null)
             {
@@ -41,7 +67,7 @@ public class Lava : MonoBehaviour
             }
 
             // Esperar antes de cargar la escena de muerte
-            StartCoroutine(CargarPantallaMuerte(delayAntesDeMorir));
+            StartCoroutine(CargarPantallaMuerte(delayAntesDeMorir + 3f)); // Espera 3s más
         }
     }
 

@@ -47,25 +47,36 @@ public class WinFlag : MonoBehaviour
         int numeroNivel = (match.Success ? int.Parse(match.Value) - 1 : -1);
 
         if (modo != null && numeroNivel >= 0 && numeroNivel < modo.niveles.Count)
-{
-    var nivel = modo.niveles[numeroNivel];
+        {
+            var nivel = modo.niveles[numeroNivel];
 
-    int nuevasMonedas = GameManager.Instance.PuntosTotales;
-    float nuevoTiempo = GameManager.Instance.Timer;
+            int nuevasMonedas = GameManager.Instance.PuntosTotales;
+            float nuevoTiempo = GameManager.Instance.Timer;
 
-    // Guardar solo si hay mejora de monedas
-    if (nuevasMonedas > nivel.monedasRecogidas)
-    {
-        Debug.Log($"[Guardado] Mejorando monedas: {nivel.monedasRecogidas} -> {nuevasMonedas}");
-        nivel.monedasRecogidas = nuevasMonedas;
-    }
+            // Guardar nombre del nivel si aún no está asignado
+            nivel.nombreNivel = escenaActual;
 
-    // Guardar solo si el tiempo es mejor o no existía
-    if (nivel.mejorTiempo <= 0f || nuevoTiempo < nivel.mejorTiempo)
-    {
-        Debug.Log($"[Guardado] Mejorando tiempo: {nivel.mejorTiempo} -> {nuevoTiempo}");
-        nivel.mejorTiempo = nuevoTiempo;
-    }
+            // Solo actualiza si mejora los datos actuales
+            if (nuevasMonedas > nivel.monedasRecogidas)
+            {
+                nivel.monedasRecogidas = nuevasMonedas;
+                nivel.porcentajeGuardado = nuevasMonedas * 2f;
+            }
+
+            if (nivel.mejorTiempo <= 0f || nuevoTiempo < nivel.mejorTiempo)
+            {
+                nivel.mejorTiempo = nuevoTiempo;
+            }
+
+            if (!nivel.completado)
+            {
+                nivel.completado = true;
+            }
+
+            progreso.Guardar();
+
+            Debug.Log($"Guardado nivel: {escenaActual} | Tiempo: {nivel.mejorTiempo} | Monedas: {nivel.monedasRecogidas} | Porcentaje: {nivel.porcentajeGuardado} | Nombre: {nivel.nombreNivel}");
+        
 
     // Marcar como completado si no lo estaba
     if (!nivel.completado)

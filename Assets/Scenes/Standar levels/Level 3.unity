@@ -6838,7 +6838,7 @@ MonoBehaviour:
   tiempoBloqueoMovimiento: 1
   fuerzaGolpe: 500
   SonidoSalto: {fileID: 8300000, guid: 4b016d2cc086d5f44afb1261f79ec45e, type: 3}
-  SonidoGolpe: {fileID: 8300000, guid: 0d52d66212dbb024b9b1639e7a022a85, type: 3}
+  SonidoGolpe: {fileID: 8300000, guid: 3f06fcab0cb6d774cb9b03a98f8a6bcf, type: 3}
   coolDownParpadeo: 0
   suavizadoAceleracion: 5
   "puedeRecibirDa\xF1o": 0
