@@ -7,31 +7,44 @@ public class HUD : MonoBehaviour
 {
     public TextMeshProUGUI puntos;
     public GameObject[] vidas;
-    // Campo para el timer que se actualiza cada centésima de segundo
+
     public TextMeshProUGUI timerText;
-    // Nuevo campo para el timer que solo se actualiza al cambiar de escena
     public TextMeshProUGUI timerStaticText;
+
+    // ✅ Referencia al botón que quieres ocultar si venimos del nivel 10
+    public GameObject botonFinal;
 
     void Start()
     {
-        // Puedes inicializar aquí si lo requieres
+        // ✅ Comprobación para ocultar el botón si la última escena termina en "10"
+        if (botonFinal != null && SceneTracker.EscenaAnterior != null)
+        {
+            if (SceneTracker.EscenaAnterior.EndsWith("10"))
+            {
+                Debug.Log("[HUD] Escena anterior termina en 10. Ocultando botón final.");
+                botonFinal.SetActive(false);
+            }
+            else
+            {
+                botonFinal.SetActive(true);
+            }
+        }
     }
 
     void Update()
     {
-        // Actualiza el marcador de puntos
         puntos.text = GameManager.Instance.PuntosTotales.ToString();
-        // Solo actualizamos timerText cada frame (el campo que muestra el timer en tiempo real)
-        // No se actualiza timerStaticText aquí.
     }
 
-    public void ActualizarPuntos(int puntosTotales){
+    public void ActualizarPuntos(int puntosTotales)
+    {
         puntos.text = puntosTotales.ToString();
     }
 
-    // Método para actualizar el timer que se actualiza continuamente
-    public void ActualizarTimer(float t) {
-        if(timerText != null) {
+    public void ActualizarTimer(float t)
+    {
+        if (timerText != null)
+        {
             int minutes = Mathf.FloorToInt(t / 60);
             int seconds = Mathf.FloorToInt(t % 60);
             int hundredths = Mathf.FloorToInt((t * 100) % 100);
@@ -39,9 +52,10 @@ public class HUD : MonoBehaviour
         }
     }
 
-    // Nuevo método para actualizar el timer que se actualiza solo al cambiar de escena
-    public void ActualizarTimerStatic(float t) {
-        if(timerStaticText != null) {
+    public void ActualizarTimerStatic(float t)
+    {
+        if (timerStaticText != null)
+        {
             int minutes = Mathf.FloorToInt(t / 60);
             int seconds = Mathf.FloorToInt(t % 60);
             int hundredths = Mathf.FloorToInt((t * 100) % 100);
@@ -49,11 +63,13 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void DesactivarVida(int indice){
+    public void DesactivarVida(int indice)
+    {
         vidas[indice].SetActive(false);
     }
 
-    public void ActivarVida(int indice){
+    public void ActivarVida(int indice)
+    {
         vidas[indice].SetActive(true);
     }
 }

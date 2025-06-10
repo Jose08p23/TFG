@@ -30,6 +30,10 @@ public class PlayerController : MonoBehaviour
 
     private float velocidadActual = 0f;
 
+    // Input para soporte táctil y tradicional
+    private float inputHorizontal = 0f;
+    private bool jumpPressed = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -53,9 +57,17 @@ public class PlayerController : MonoBehaviour
     {
         if (movimientoHabilitado)
         {
+            // Input de salto por teclado/mando
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump"))
             {
                 tiempoUltimaTeclaSalto = tiempoBufferSalto;
+            }
+
+            // Input de salto por botón táctil
+            if (jumpPressed)
+            {
+                tiempoUltimaTeclaSalto = tiempoBufferSalto;
+                jumpPressed = false; // Reset tras pulsar
             }
             else
             {
@@ -76,12 +88,17 @@ public class PlayerController : MonoBehaviour
         float inputTeclado = Input.GetAxis("Horizontal");
         float inputDpad = Input.GetAxis("DPadX");
 
-        // Elegir el input más fuerte (DPad tiene prioridad si activo)
-        float inputMovimiento = Mathf.Abs(inputDpad) > 0.1f ? inputDpad : inputTeclado;
+        // NUEVO: Prioridad al input táctil si está activo, luego dpad, luego teclado
+        float inputMovimiento = 0f;
+        if (Mathf.Abs(inputHorizontal) > 0.01f)
+            inputMovimiento = inputHorizontal;
+        else if (Mathf.Abs(inputDpad) > 0.1f)
+            inputMovimiento = inputDpad;
+        else
+            inputMovimiento = inputTeclado;
 
         animator.SetBool("isRunning", Mathf.Abs(inputMovimiento) > 0.01f);
 
-        // Detectar si estamos usando joystick (valor parcial)
         bool usandoJoystick = Mathf.Abs(inputMovimiento) < 0.99f;
         float factorSuavizado = usandoJoystick ? suavizadoAceleracion : suavizadoAceleracion * 2f;
 
@@ -272,16 +289,26 @@ public class PlayerController : MonoBehaviour
     }
 
     public void BloquearMovimientoTemporal(float segundos)
-{
-    StartCoroutine(BloquearMovimientoCoroutine(segundos));
-}
+    {
+        StartCoroutine(BloquearMovimientoCoroutine(segundos));
+    }
 
-private IEnumerator BloquearMovimientoCoroutine(float segundos)
-{
-    movimientoHabilitado = false;
-    rb.velocity = Vector2.zero;  // ¡Esto para que se quede quieto!
-    yield return new WaitForSeconds(segundos);
-    movimientoHabilitado = true;
-}
+    private IEnumerator BloquearMovimientoCoroutine(float segundos)
+    {
+        movimientoHabilitado = false;
+        rb.velocity = Vector2.zero;  // ¡Esto para que se quede quieto!
+        yield return new WaitForSeconds(segundos);
+        movimientoHabilitado = true;
+    }
 
+    // ===== NUEVO: Métodos públicos para input táctil =====
+    public void SetHorizontalInput(float value)
+    {
+        inputHorizontal = value;
+    }
+
+    public void PressJump()
+    {
+        jumpPressed = true;
+    }
 }

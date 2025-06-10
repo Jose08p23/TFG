@@ -2274,6 +2274,7 @@ MonoBehaviour:
   - {fileID: 1365598437}
   timerText: {fileID: 99103172}
   timerStaticText: {fileID: 0}
+  botonFinal: {fileID: 0}
 --- !u!1 &339190818
 GameObject:
   m_ObjectHideFlags: 0
