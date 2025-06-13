@@ -11,7 +11,16 @@ public class AplicarVolumenAudio : MonoBehaviour
     void Start()
     {
         audio = GetComponent<AudioSource>();
+        ActualizarVolumen();
+    }
 
+    void Update()
+    {
+        ActualizarVolumen();
+    }
+
+    private void ActualizarVolumen()
+    {
         if (GameManager.Instance != null)
         {
             if (tipo == TipoVolumen.Musica)
